@@ -1,0 +1,12 @@
+asyncpg>=0.29
+SQLAlchemy>=2
+pydantic-settings>=2
+httpx>=0.28
+websockets>=12
+sse-starlette==2.0.0
+fastapi>=0.116
+uvicorn[standard]>=0.35
+solana>=0.33
+solders>=0.18
+tenacity>=8
+jinja2>=3.1
