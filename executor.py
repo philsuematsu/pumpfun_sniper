@@ -33,11 +33,12 @@ async def monitor_loop():
  continue
  # update trailing stop
  new_stop = max(p.stop_price, curr * (1 - settings.TRAIL_STOP_PCT / 100))
- async with session_ctx() as s:
- pos = await s.get(OpenPos, p.mint)
- pos.stop_price = new_stop
- pos.updated_at = dt.datetime.utcnow()
- await s.commit()
+    async with session_ctx() as s:
+        pos = await s.get(OpenPos, p.mint)
+        pos.stop_price = new_stop
+        pos.unrealized_pnl = (curr - pos.avg_price) * pos.qty
+        pos.updated_at = dt.datetime.utcnow()
+        await s.commit()
 
  # exit conditions
  if curr <= new_stop or curr >= p.take_profit:
