@@ -75,9 +75,9 @@ Because the bot reads its own tables on start‑up, you can stop and restart the
 # 1. requirements
 python -m pip install --user -r requirements.txt
 
-# 2. Postgres (one‑time)
-sudo -u postgres psql -c "CREATE ROLE pumpfun_sniper LOGIN PASSWORD 'password';"
-sudo -u postgres psql -c "CREATE DATABASE pumpfun_sniper OWNER pumpfun_sniper;"
+# 2. Postgres (one‑time) (may require sudo -u postgres command prefix)
+psql -c "CREATE ROLE pumpfun_sniper LOGIN PASSWORD 'password';"
+psql -c "CREATE DATABASE pumpfun_sniper OWNER pumpfun_sniper;"
 
 # 3. config
 cp .env.sample .env && nano .env   # fill API keys, wallet path, DB_DSN, etc.
