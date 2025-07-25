@@ -43,8 +43,9 @@ class OpenPos(Base):
  cost: Mapped[float] = mapped_column(Float)
  stop_price: Mapped[float] = mapped_column(Float)
  take_profit: Mapped[float] = mapped_column(Float)
- opened_at: Mapped[dt.datetime] = mapped_column(DateTime)
- updated_at:Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow)
+    opened_at: Mapped[dt.datetime] = mapped_column(DateTime)
+    updated_at: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow)
+    unrealized_pnl: Mapped[float] = mapped_column(Float, default=0.0)
 
 class ClosedPos(Base):
  __tablename__ = "closed_positions"
