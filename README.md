@@ -55,7 +55,12 @@ Because the bot reads its own tables on start‑up, you can stop and restart the
 * FastAPI streams Server‑Sent Events (`/socket/*`) so rows update live without page reloads.  
 * No frontend build pipeline—just open **http://localhost:8000**.
 
----
+# alternatively set ENV_PATH to another secrets file
+# 4. optional simulation mode
+# set SIMULATION=true in your .env for paper trading
+
+# 5. run
+
 ## Configuration reference (.env)
 | Variable | Purpose | Example
 |----------|---------|---------|

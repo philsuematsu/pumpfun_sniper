@@ -16,6 +16,7 @@ for var in [
     "DB_DSN",
 ]:
     os.environ.setdefault(var, "test")
+os.environ.setdefault("ENV_PATH", "/dev/null")
 
 import types
 
