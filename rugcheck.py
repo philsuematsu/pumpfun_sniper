@@ -2,7 +2,8 @@
 Thin async wrapper around RugCheck.xyz public API plus threshold comparison.
 """
 
-import httpx, asyncio
+import asyncio
+import httpx
 from pumpfun_sniper.config import settings
 from pumpfun_sniper.db import log
 
@@ -14,21 +15,28 @@ THRESHOLDS = {
 }
 
 async def fetch(mint: str) -> dict:
- url = f"https://api.rugcheck.xyz/v1/token/{mint}"
+ """Fetch full token report from RugCheck."""
+ url = f"https://api.rugcheck.xyz/v1/tokens/{mint}/report"
  async with httpx.AsyncClient(timeout=10) as cli:
- r = await cli.get(url, headers={"Authorization": f"Bearer {settings.RUGCHECK_KEY}"})
+ r = await cli.get(url)
  r.raise_for_status()
  return r.json()
 
 def is_good(tok: dict) -> bool:
  try:
+ holders = tok.get("totalHolders", 0)
+ lp_locked = tok.get("lpLockedPct") or 0
+ supply = tok["token"]["supply"]
+ decimals = tok["token"]["decimals"]
+ creator_pct = tok.get("creatorBalance", 0) / supply * 100
+ market_cap = tok.get("price", 0) * (supply / (10 ** decimals))
  return (
- tok["holders"] >= THRESHOLDS["holders"]
- and tok["lp_locked_pct"] >= THRESHOLDS["lp_locked_pct"]
- and tok["creator_balance_pct"] <= THRESHOLDS["creator_balance_pct"]
- and tok["market_cap_usd"] >= THRESHOLDS["market_cap_usd"]
+ holders >= THRESHOLDS["holders"]
+ and lp_locked >= THRESHOLDS["lp_locked_pct"]
+ and creator_pct <= THRESHOLDS["creator_balance_pct"]
+ and market_cap >= THRESHOLDS["market_cap_usd"]
  )
- except (KeyError, TypeError):
+ except (KeyError, TypeError, ZeroDivisionError):
  return False
 
 async def wait_until_good(mint: str, timeout_sec: int) -> bool:
