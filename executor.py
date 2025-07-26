@@ -10,6 +10,7 @@ from pumpfun_sniper.birdeye import get_prices
 from pumpfun_sniper.bonding import bonding_pct
 from pumpfun_sniper.jupiter import sell
 
+
 async def _close(p: OpenPos, exit_price: float):
     pnl = (exit_price - p.avg_price) * p.qty
     async with session_ctx() as s:
@@ -26,6 +27,7 @@ async def _close(p: OpenPos, exit_price: float):
         s.add(closed)
         await s.commit()
     await log("INFO", f"CLOSED {p.mint[:6]}… PnL={pnl:.4f} SOL")
+
 
 async def monitor_loop():
     while True:

@@ -16,12 +16,14 @@ from pumpfun_sniper.db import log
 _SOL = "So11111111111111111111111111111111111111112"
 _keypair: Keypair | None = None
 
+
 def kp() -> Keypair:
     global _keypair
     if _keypair is None:
         with open(settings.KEYPAIR_PATH, "r") as fh:
             _keypair = Keypair.from_json(json.load(fh))
     return _keypair
+
 
 async def _quote(inp: str, out: str, amount: int) -> dict:
     async with httpx.AsyncClient(timeout=10) as cli:
@@ -37,6 +39,7 @@ async def _quote(inp: str, out: str, amount: int) -> dict:
         r.raise_for_status()
         return r.json()["data"][0]
 
+
 async def _swap_tx(route: dict) -> bytes:
     async with httpx.AsyncClient(timeout=10) as cli:
         r = await cli.post(
@@ -51,8 +54,11 @@ async def _swap_tx(route: dict) -> bytes:
         r.raise_for_status()
         return base64.b64decode(r.json()["swapTransaction"])
 
-@retry(stop=stop_after_attempt(settings.MAX_RETRIES),
- wait=wait_exponential(multiplier=settings.BACKOFF_SEC))
+
+@retry(
+    stop=stop_after_attempt(settings.MAX_RETRIES),
+    wait=wait_exponential(multiplier=settings.BACKOFF_SEC),
+)
 async def _send(raw: bytes) -> str:
     tx = Transaction.from_bytes(raw)
     tx.sign(kp())
@@ -67,6 +73,7 @@ async def _send(raw: bytes) -> str:
         await rpc.confirm_transaction(sig, commitment="confirmed")
         return sig
 
+
 # Public helpers --------------------------------------------------------------
 async def buy(sol_amount: float, mint: str) -> tuple[float, str]:
     lamports = int(sol_amount * 1e9)
@@ -80,6 +87,7 @@ async def buy(sol_amount: float, mint: str) -> tuple[float, str]:
     await log("INFO", f"BUY {mint[:6]}… {sol_amount} SOL sig={sig}")
     return price, sig
 
+
 async def sell(mint: str, qty: int) -> str:
     route = await _quote(mint, _SOL, qty)
     if settings.SIMULATION:
@@ -89,4 +97,3 @@ async def sell(mint: str, qty: int) -> str:
     sig = await _send(raw)
     await log("INFO", f"SELL {mint[:6]}… qty={qty} sig={sig}")
     return sig
-

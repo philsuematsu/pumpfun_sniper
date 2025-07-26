@@ -35,7 +35,9 @@ class Settings(BaseSettings):
     # ─── Simulation mode ───────────────────────────────────────────────
     SIMULATION: bool = False
 
-    model_config = SettingsConfigDict(env_file=os.getenv("ENV_PATH", ".env"), extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=os.getenv("ENV_PATH", ".env"), extra="ignore"
+    )
 
 
 settings = Settings()  # import this everywhere

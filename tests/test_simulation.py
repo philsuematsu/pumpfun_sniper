@@ -11,8 +11,12 @@ sys.modules["solana.rpc.async_api"] = types.SimpleNamespace(AsyncClient=object)
 sys.modules["solders.keypair"] = types.SimpleNamespace(Keypair=object)
 sys.modules["solana.transaction"] = types.SimpleNamespace(Transaction=object)
 sys.modules["solana.rpc.types"] = types.SimpleNamespace(TxOpts=object)
+
+
 async def _alog(*a, **k):
     return None
+
+
 sys.modules["pumpfun_sniper.db"] = types.SimpleNamespace(log=_alog)
 
 for var in [
@@ -56,4 +60,3 @@ async def test_buy_sell_simulation(monkeypatch):
     sig2 = await jupiter.sell("mint", 123)
     assert sig2 == "SIMULATED"
     assert not called["swap"] and not called["send"]
-

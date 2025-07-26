@@ -7,6 +7,7 @@ from pumpfun_sniper.config import settings
 
 ENDPOINT = "https://public-api.birdeye.so/defi/price_volume/multi"
 
+
 async def get_prices(mints: list[str]) -> dict[str, float]:
     if not mints:
         return {}

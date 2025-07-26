@@ -16,10 +16,13 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"])
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 HTML = (BASE / "static" / "index.html").read_text()
 
-@app.get("/", response_class=HTMLResponse)
-async def index(): return HTML
 
-def _row(obj, cols): # serialize SQLAlchemy row
+@app.get("/", response_class=HTMLResponse)
+async def index():
+    return HTML
+
+
+def _row(obj, cols):  # serialize SQLAlchemy row
     d = {}
     for c in cols:
         v = getattr(obj, c)
@@ -28,16 +31,16 @@ def _row(obj, cols): # serialize SQLAlchemy row
         d[c] = v
     return d
 
+
 async def _stream(model, cols, order_col):
     while True:
         async with async_session() as s:
             rows = (
-                await s.scalars(
-                    model.__table__.select().order_by(order_col.desc())
-                )
+                await s.scalars(model.__table__.select().order_by(order_col.desc()))
             ).all()
         yield "data:" + json.dumps([_row(r, cols) for r in rows]) + "\n\n"
         await asyncio.sleep(2)
+
 
 @app.get("/socket/candidates")
 async def sse_candidates():
@@ -49,17 +52,25 @@ async def sse_candidates():
         )
     )
 
+
 @app.get("/socket/open")
 async def sse_open():
- return EventSourceResponse(_stream(OpenPos,
- ["mint","qty","avg_price","stop_price","take_profit","updated_at"], OpenPos.updated_at))
+    return EventSourceResponse(
+        _stream(
+            OpenPos,
+            ["mint", "qty", "avg_price", "stop_price", "take_profit", "updated_at"],
+            OpenPos.updated_at,
+        )
+    )
+
 
 @app.get("/socket/closed")
 async def sse_closed():
- return EventSourceResponse(_stream(ClosedPos,
- ["mint","qty","pnl","closed_at"], ClosedPos.closed_at))
+    return EventSourceResponse(
+        _stream(ClosedPos, ["mint", "qty", "pnl", "closed_at"], ClosedPos.closed_at)
+    )
+
 
 @app.get("/socket/logs")
 async def sse_logs():
- return EventSourceResponse(_stream(LogEntry,
- ["ts","level","msg"], LogEntry.ts))
+    return EventSourceResponse(_stream(LogEntry, ["ts", "level", "msg"], LogEntry.ts))

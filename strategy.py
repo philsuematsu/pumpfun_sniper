@@ -4,15 +4,17 @@ Examines NEW candidates, waits RugCheck + grace periods, then executes BUYs.
 
 import asyncio, math, datetime as dt
 from pumpfun_sniper.config import settings
-from pumpfun_sniper.db import (session_ctx, Candidate, OpenPos, log)
+from pumpfun_sniper.db import session_ctx, Candidate, OpenPos, log
 from pumpfun_sniper.rugcheck import wait_until_good
 from pumpfun_sniper.jupiter import buy
+
 
 async def _update_status(mint: str, status: str):
     async with session_ctx() as s:
         cand = await s.get(Candidate, mint)
         cand.status = status
         await s.commit()
+
 
 async def process_candidate(row: Candidate) -> None:
     await asyncio.sleep(settings.CREATION_GRACE_SEC)
