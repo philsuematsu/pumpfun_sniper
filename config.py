@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     # ─── Simulation mode ───────────────────────────────────────────────
     SIMULATION: bool = False
 
+    # ─── Debug mode ─────────────────────────────────────────────────────
+    DEBUG: str = "off"
+
     model_config = SettingsConfigDict(
         env_file=os.getenv("ENV_PATH", ".env"), extra="ignore"
     )

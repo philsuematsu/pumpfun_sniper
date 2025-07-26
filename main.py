@@ -3,6 +3,7 @@ App entry‑point. Spins up DB, Helius watcher, candidate evaluator,
 position monitor, and the FastAPI dashboard (Uvicorn in a background thread).
 """
 
+import os
 import asyncio, uvicorn
 
 from pumpfun_sniper.db import init, async_session, Candidate
@@ -10,7 +11,7 @@ from pumpfun_sniper.helius_watcher import helius_loop
 from pumpfun_sniper.strategy import process_candidate
 from pumpfun_sniper.executor import monitor_loop
 from pumpfun_sniper.dashboard import app
-
+from pumpfun_sniper.config import settings
 
 async def _eval_loop():
     while True:
@@ -26,6 +27,8 @@ async def _eval_loop():
 
 
 async def main():
+    print(f"[DEBUG] DEBUG={settings.DEBUG}")
+
     await init()
     tasks = [
         helius_loop(),
