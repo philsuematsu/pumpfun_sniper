@@ -8,6 +8,7 @@ import asyncio, base64, json, re, datetime as dt, websockets
 
 from pumpfun_sniper.config import settings
 from pumpfun_sniper.db import session_ctx, SeenName, BlockedCreator, Candidate, log
+from pumpfun_sniper.debug import dbg
 
 PUMP_FUN_PROGRAM = "Pump11111111111111111111111111111111111111"
 
@@ -34,9 +35,12 @@ async def helius_loop() -> None:
         "params": [{"mentions": [PUMP_FUN_PROGRAM]}, "processed"],
     }
     try:
+        dbg(f"HELIUS connect {settings.HELIUS_WSS}")
         async with websockets.connect(settings.HELIUS_WSS, ping_interval=20) as ws:
             await ws.send(json.dumps(sub))
+            dbg(f"HELIUS send {sub}")
             async for raw in ws:
+                dbg(f"HELIUS recv {raw}")
                 data = json.loads(raw)
                 if "params" not in data:
                     continue

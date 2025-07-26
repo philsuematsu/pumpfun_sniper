@@ -6,6 +6,7 @@ import asyncio
 import httpx
 from pumpfun_sniper.config import settings
 from pumpfun_sniper.db import log
+from pumpfun_sniper.debug import dbg
 
 THRESHOLDS = {
     "holders": 50,
@@ -19,7 +20,9 @@ async def fetch(mint: str) -> dict:
     """Fetch full token report from RugCheck."""
     url = f"https://api.rugcheck.xyz/v1/tokens/{mint}/report"
     async with httpx.AsyncClient(timeout=10) as cli:
+        dbg(f"RUGCHECK GET {url}")
         r = await cli.get(url)
+        dbg(f"RUGCHECK RESPONSE {r.status_code} {r.text[:200]}")
         r.raise_for_status()
         return r.json()
 

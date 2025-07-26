@@ -9,5 +9,6 @@ __all__ = [
     "birdeye",
     "bonding",
     "rugcheck",
+    "debug",
 ]
 __version__ = "0.2.0"
