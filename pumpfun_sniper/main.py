@@ -1,12 +1,12 @@
-"""
-App entry‑point. Spins up DB, Helius watcher, candidate evaluator,
-position monitor, and the FastAPI dashboard (Uvicorn in a background thread).
-"""
+"""App entry-point. Spins up DB, Helius watcher, candidate evaluator,
+position monitor and the FastAPI dashboard."""
 
 import os
 import sys
 import signal
-import asyncio, uvicorn
+import threading
+import asyncio
+import uvicorn
 
 from pumpfun_sniper.db import init, async_session, Candidate
 from pumpfun_sniper.helius_watcher import helius_loop
@@ -15,13 +15,6 @@ from pumpfun_sniper.executor import monitor_loop
 from pumpfun_sniper.dashboard import app
 from pumpfun_sniper.config import settings
 
-
-def _exit_handler(signum, frame):
-    """Exit immediately on Ctrl-C."""
-    print("Received SIGINT, exiting...", flush=True)
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, _exit_handler)
 
 async def _eval_loop():
     while True:
@@ -36,23 +29,39 @@ async def _eval_loop():
         await asyncio.sleep(5)
 
 
-async def main():
+async def main() -> None:
+    loop = asyncio.get_running_loop()
+    stop = asyncio.Event()
+
+    def _exit_handler() -> None:
+        """Exit cleanly on Ctrl-C."""
+        print("Received SIGINT, exiting...", flush=True)
+        stop.set()
+
+    loop.add_signal_handler(signal.SIGINT, _exit_handler)
+
     print(f"[DEBUG] DEBUG={settings.DEBUG}")
 
     await init()
+
+    # Run FastAPI dashboard in a daemon thread so process can exit immediately
+    thread = threading.Thread(
+        target=uvicorn.run,
+        kwargs={"app": app, "host": "0.0.0.0", "port": 8000, "log_level": "warning"},
+        daemon=True,
+    )
+    thread.start()
+
     tasks = [
-        helius_loop(),
-        _eval_loop(),
-        monitor_loop(),
-        asyncio.to_thread(
-            uvicorn.run,
-            app,
-            host="0.0.0.0",
-            port=8000,
-            log_level="warning",
-        ),
+        asyncio.create_task(helius_loop()),
+        asyncio.create_task(_eval_loop()),
+        asyncio.create_task(monitor_loop()),
     ]
-    await asyncio.gather(*tasks)
+
+    await stop.wait()
+    for t in tasks:
+        t.cancel()
+    await asyncio.gather(*tasks, return_exceptions=True)
 
 
 if __name__ == "__main__":
