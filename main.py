@@ -4,6 +4,8 @@ position monitor, and the FastAPI dashboard (Uvicorn in a background thread).
 """
 
 import os
+import sys
+import signal
 import asyncio, uvicorn
 
 from pumpfun_sniper.db import init, async_session, Candidate
@@ -12,6 +14,14 @@ from pumpfun_sniper.strategy import process_candidate
 from pumpfun_sniper.executor import monitor_loop
 from pumpfun_sniper.dashboard import app
 from pumpfun_sniper.config import settings
+
+
+def _exit_handler(signum, frame):
+    """Exit immediately on Ctrl-C."""
+    print("Received SIGINT, exiting...", flush=True)
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, _exit_handler)
 
 async def _eval_loop():
     while True:
