@@ -3,6 +3,7 @@ Async SQLAlchemy setup + helper CRUD shortcuts.
 Tables are created automatically on first run (no Alembic needed).
 """
 
+import os
 import datetime as dt
 from typing import AsyncGenerator
 
@@ -10,8 +11,14 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker, mapped_column, Mapped
 from sqlalchemy import String, DateTime, Float, Integer, select
 from pumpfun_sniper.config import settings
+from pumpfun_sniper.debug import dbg
 
-engine = create_async_engine(settings.DB_DSN, echo=False, pool_size=10, max_overflow=20)
+engine = create_async_engine(
+    settings.DB_DSN,
+    echo=os.getenv("DEBUG") == "verbose",
+    pool_size=10,
+    max_overflow=20,
+)
 async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 Base = declarative_base()
 
@@ -103,3 +110,4 @@ async def log(level: str, msg: str):
     async with session_ctx() as s:
         s.add(LogEntry(level=level[:8], msg=msg[:510]))
         await s.commit()
+    dbg(f"SQL LOG {level} {msg}")
