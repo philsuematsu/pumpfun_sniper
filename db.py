@@ -43,9 +43,9 @@ class OpenPos(Base):
  cost: Mapped[float] = mapped_column(Float)
  stop_price: Mapped[float] = mapped_column(Float)
  take_profit: Mapped[float] = mapped_column(Float)
-    opened_at: Mapped[dt.datetime] = mapped_column(DateTime)
-    updated_at: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow)
-    unrealized_pnl: Mapped[float] = mapped_column(Float, default=0.0)
+ opened_at: Mapped[dt.datetime] = mapped_column(DateTime)
+ updated_at: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow)
+ unrealized_pnl: Mapped[float] = mapped_column(Float, default=0.0)
 
 class ClosedPos(Base):
  __tablename__ = "closed_positions"
@@ -67,9 +67,9 @@ class LogEntry(Base):
 
 # ─────────────────────────── general helpers ──────────────────────────────────
 async def init() -> None:
- """Create tables if they do not yet exist."""
- async with engine.begin() as conn:
- await conn.run_sync(Base.metadata.create_all)
+    """Create tables if they do not yet exist."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 class session_ctx:
  """Async context‑manager wrapper for a session."""
@@ -79,6 +79,6 @@ class session_ctx:
 
 # tiny logger ------------------------------------------------------------------
 async def log(level: str, msg: str):
- async with session_ctx() as s:
- s.add(LogEntry(level=level[:8], msg=msg[:510]))
- await s.commit()
+    async with session_ctx() as s:
+        s.add(LogEntry(level=level[:8], msg=msg[:510]))
+        await s.commit()
