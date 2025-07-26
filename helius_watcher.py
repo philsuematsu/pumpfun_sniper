@@ -32,7 +32,10 @@ async def helius_loop() -> None:
         "jsonrpc": "2.0",
         "id": 1,
         "method": "logsSubscribe",
-        "params": [{"mentions": [PUMP_FUN_PROGRAM]}, "processed"],
+        "params": [
+            {"mentions": [PUMP_FUN_PROGRAM]},
+            {"commitment": "processed"},
+        ],
     }
     try:
         dbg(f"HELIUS connect {settings.HELIUS_WSS}")
