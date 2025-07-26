@@ -10,7 +10,7 @@ from pumpfun_sniper.config import settings
 from pumpfun_sniper.db import session_ctx, SeenName, BlockedCreator, Candidate, log
 from pumpfun_sniper.debug import dbg
 
-PUMP_FUN_PROGRAM = "Pump11111111111111111111111111111111111111"
+PUMP_FUN_PROGRAM = "Pump1111111111111111111111111111111111111111"
 
 # Regex helpers for metadata parsing ------------------------------------------
 NAME_RE = re.compile(rb"name\x04(.+?)\x00")
