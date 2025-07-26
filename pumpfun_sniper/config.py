@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     # ─── External endpoints ──────────────────────────────────────────────
     HELIUS_WSS: str  # wss://mainnet.helius-rpc.com/?api-key=…
+    PUMP_FUN_PROGRAM: str = "Pump1111111111111111111111111111111111111111"
     RUGCHECK_KEY: str
     BIRDEYE_KEY: str
     RPC_HTTP: str = "https://api.mainnet-beta.solana.com"
