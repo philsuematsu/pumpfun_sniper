@@ -42,6 +42,7 @@ All state lives in Postgres tables created at first run:
 |-------|---------|
 | `seen_names` | Block repeated token names |
 | `blocked_creators` | Addresses that rugged early |
+| PUMP_FUN_PROGRAM | pump.fun program ID | Pump1111111111111111111111111111111111111111
 | `candidates` | Mint + metadata + status (NEW, REJECTED, BOUGHT) |
 | `open_positions` | Size, avg price, dynamic stop/TP |
 | `closed_positions` | Trade history + PnL |
