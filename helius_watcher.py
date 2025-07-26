@@ -78,4 +78,6 @@ async def helius_loop() -> None:
                     await s.commit()
                 await log("INFO", f"NEW candidate {name} ({sym}) {mint[:8]}…")
     except Exception as e:
+        if isinstance(e, asyncio.CancelledError):
+            raise
         await log("ERROR", f"helius watcher failed: {e}")
