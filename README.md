@@ -59,6 +59,9 @@ Because the bot reads its own tables on start‑up, you can stop and restart the
 # 4. optional simulation mode
 # set SIMULATION=true in your .env for paper trading
 
+# Alternatively use SQLite for quick tests:
+# DB_DSN=sqlite+aiosqlite:///test.db (install aiosqlite)
+
 # 5. run
 
 ## Configuration reference (.env)
