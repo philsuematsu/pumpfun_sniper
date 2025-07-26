@@ -5,6 +5,7 @@ Fetch bonding‑curve percentage from Moralis' PumpFun endpoint.
 import httpx
 from pumpfun_sniper.config import settings
 
+
 async def bonding_pct(mint: str) -> float | None:
     if not settings.MORALIS_KEY:
         return None

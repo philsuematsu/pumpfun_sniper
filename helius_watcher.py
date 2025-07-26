@@ -15,11 +15,16 @@ PUMP_FUN_PROGRAM = "Pump11111111111111111111111111111111111111"
 NAME_RE = re.compile(rb"name\x04(.+?)\x00")
 SYMB_RE = re.compile(rb"symbol\x06(.+?)\x00")
 
-async def name_seen(name:str) -> bool:
- async with session_ctx() as s: return await s.get(SeenName, name) is not None
 
-async def creator_blocked(creator:str) -> bool:
- async with session_ctx() as s: return await s.get(BlockedCreator, creator) is not None
+async def name_seen(name: str) -> bool:
+    async with session_ctx() as s:
+        return await s.get(SeenName, name) is not None
+
+
+async def creator_blocked(creator: str) -> bool:
+    async with session_ctx() as s:
+        return await s.get(BlockedCreator, creator) is not None
+
 
 async def helius_loop() -> None:
     sub = {

@@ -11,19 +11,19 @@ from pumpfun_sniper.strategy import process_candidate
 from pumpfun_sniper.executor import monitor_loop
 from pumpfun_sniper.dashboard import app
 
+
 async def _eval_loop():
     while True:
         async with async_session() as s:
             cands = (
                 await s.scalars(
-                    Candidate.__table__.select().where(
-                        Candidate.status == "NEW"
-                    )
+                    Candidate.__table__.select().where(Candidate.status == "NEW")
                 )
             ).all()
             for c in cands:
                 await process_candidate(c)
         await asyncio.sleep(5)
+
 
 async def main():
     await init()
@@ -40,6 +40,7 @@ async def main():
         ),
     ]
     await asyncio.gather(*tasks)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
