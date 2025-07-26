@@ -7,7 +7,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair
-from solana.transaction import Transaction
+from solders.transaction import Transaction
 from solana.rpc.types import TxOpts
 
 from pumpfun_sniper.config import settings
@@ -54,7 +54,7 @@ async def _swap_tx(route: dict) -> bytes:
 @retry(stop=stop_after_attempt(settings.MAX_RETRIES),
  wait=wait_exponential(multiplier=settings.BACKOFF_SEC))
 async def _send(raw: bytes) -> str:
-    tx = Transaction.deserialize(raw)
+    tx = Transaction.from_bytes(raw)
     tx.sign(kp())
     async with AsyncClient(settings.RPC_HTTP) as rpc:
         sig = (

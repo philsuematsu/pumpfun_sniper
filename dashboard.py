@@ -20,24 +20,34 @@ HTML = (BASE / "static" / "index.html").read_text()
 async def index(): return HTML
 
 def _row(obj, cols): # serialize SQLAlchemy row
- d={}
- for c in cols:
- v=getattr(obj, c)
- if isinstance(v, dt.datetime): v=v.isoformat(sep=" ", timespec="seconds")
- d[c]=v
- return d
+    d = {}
+    for c in cols:
+        v = getattr(obj, c)
+        if isinstance(v, dt.datetime):
+            v = v.isoformat(sep=" ", timespec="seconds")
+        d[c] = v
+    return d
 
 async def _stream(model, cols, order_col):
- while True:
- async with async_session() as s:
- rows=(await s.scalars(model.__table__.select().order_by(order_col.desc()))).all()
- yield "data:"+json.dumps([_row(r,cols) for r in rows])+"\n\n"
- await asyncio.sleep(2)
+    while True:
+        async with async_session() as s:
+            rows = (
+                await s.scalars(
+                    model.__table__.select().order_by(order_col.desc())
+                )
+            ).all()
+        yield "data:" + json.dumps([_row(r, cols) for r in rows]) + "\n\n"
+        await asyncio.sleep(2)
 
 @app.get("/socket/candidates")
 async def sse_candidates():
- return EventSourceResponse(_stream(Candidate,
- ["mint","name","status","created_at"], Candidate.created_at))
+    return EventSourceResponse(
+        _stream(
+            Candidate,
+            ["mint", "name", "status", "created_at"],
+            Candidate.created_at,
+        )
+    )
 
 @app.get("/socket/open")
 async def sse_open():
